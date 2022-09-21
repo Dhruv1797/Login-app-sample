@@ -1,4 +1,8 @@
+import 'dart:math';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:project_1/content.dart';
 
 import 'package:project_1/intro_page.dart';
@@ -12,11 +16,108 @@ class Login extends StatefulWidget {
 
 class _LoginPageState extends State<Login> {
   bool _switchValue = true;
+  final _formKey = GlobalKey<FormState>();
+
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  // firebase
+  final _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
+    final emailField = TextFormField(
+      autofocus: false,
+      controller: emailController,
+      onSaved: (value) {
+        emailController.text = value!;
+      },
+      validator: (value) {
+        if (value!.isEmpty) {
+          return "Please Enter your Email";
+        }
+        // reg expression for email validation
+        if (!RegExp("^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]").hasMatch(value)) {
+          return ("Please Enter a valid email");
+        }
+        return null;
+      },
+      textInputAction: TextInputAction.next,
+      keyboardType: TextInputType.emailAddress,
+      decoration: InputDecoration(
+          prefixIcon: Icon(Icons.person),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(100.0),
+            borderSide: new BorderSide(color: Colors.teal),
+          ),
+          filled: true,
+          hintStyle: TextStyle(color: Colors.grey[800]),
+          hintText: "Enter Email i'd",
+          fillColor: Colors.white70),
+    );
+    final PasswordField = TextFormField(
+      obscureText: true,
+      autofocus: false,
+      controller: passwordController,
+      onSaved: (value) {
+        passwordController.text = value!;
+      },
+      validator: (value) {
+        RegExp regex = new RegExp(r'^.{6,}$');
+        if (value!.isEmpty) {
+          return ("Password is required for login");
+        }
+        if (!regex.hasMatch(value)) {
+          return ("Enter Valid Password(Min. 6 Character)");
+        }
+      },
+      textInputAction: TextInputAction.done,
+      keyboardType: TextInputType.visiblePassword,
+      decoration: InputDecoration(
+          prefixIcon: Icon(Icons.lock),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(100.0),
+            borderSide: new BorderSide(color: Colors.teal),
+          ),
+          filled: true,
+          hintStyle: TextStyle(color: Colors.grey[800]),
+          hintText: "Enter password",
+          fillColor: Colors.white70),
+    );
+
+    // final loginButton = Material(
+    //   elevation: 5,
+    //   borderRadius: BorderRadius.circular(30),
+    //   color: Colors.teal,
+    //   child: MaterialButton(
+    //       padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+    //       minWidth: MediaQuery.of(context).size.width,
+    //       onPressed: () {
+    //         SignupFun(emailController.text, passwordController.text);
+    //       },
+    //       child: Text(
+    //         "Login",
+    //         textAlign: TextAlign.center,
+    //         style: TextStyle(
+    //             fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
+    //       )),
+    // );
+
     return Scaffold(
+      // appBar: AppBar(
+      //   backgroundColor: Theme.of(context).primaryColor,
+      //   elevation: 0,
+      //   leading: IconButton(
+      //     onPressed: () {
+      //       Navigator.pop(context);
+      //     },
+      //     icon: Icon(
+      //       Icons.arrow_back,
+      //       size: 40,
+      //     ),
+      //   ),
+      // ),
       body: Container(
         child: SingleChildScrollView(
           child: Container(
@@ -72,6 +173,8 @@ class _LoginPageState extends State<Login> {
                       ),
                       child: SingleChildScrollView(
                         child: Container(
+                          // color: Colors.red,
+
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: <Widget>[
@@ -203,51 +306,77 @@ class _LoginPageState extends State<Login> {
                                 // color: Colors.amber,
                               ),
                               Container(
-                                height: 20,
+                                height: 15,
                                 width: double.infinity,
                                 // color: Colors.amber,
-                              ),
-                              SizedBox(
-                                width: deviceSize.width * 0.9,
-                                child: TextField(
-                                  decoration: InputDecoration(
-                                      prefixIcon: Icon(Icons.person),
-                                      border: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(100.0),
-                                        borderSide:
-                                            new BorderSide(color: Colors.teal),
-                                      ),
-                                      filled: true,
-                                      hintStyle:
-                                          TextStyle(color: Colors.grey[800]),
-                                      hintText: "Enter User id",
-                                      fillColor: Colors.white70),
-                                ),
                               ),
                               Container(
-                                height: 20,
-                                width: double.infinity,
+                                width: deviceSize.width * 0.87,
+                                color: Colors.white,
+                                child: Form(
+                                  key: _formKey,
+                                  child: Column(
+                                    children: <Widget>[
+                                      emailField,
+                                      Container(
+                                        height: 30,
+                                        width: double.infinity,
+                                        // color: Colors.amber,
+                                      ),
+                                      PasswordField,
+                                      Container(
+                                        height: 30,
+                                        width: double.infinity,
+                                        // color: Colors.amber,
+                                      ),
+                                      // loginButton,
+                                    ],
+                                  ),
+                                ),
                                 // color: Colors.amber,
                               ),
-                              SizedBox(
-                                width: deviceSize.width * 0.9,
-                                child: TextField(
-                                  decoration: InputDecoration(
-                                      prefixIcon: Icon(Icons.lock),
-                                      border: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(100.0),
-                                        borderSide:
-                                            new BorderSide(color: Colors.teal),
-                                      ),
-                                      filled: true,
-                                      hintStyle:
-                                          TextStyle(color: Colors.grey[800]),
-                                      hintText: "Enter password",
-                                      fillColor: Colors.white70),
-                                ),
-                              ),
+
+                              // SizedBox(
+                              //   width: deviceSize.width * 0.9,
+                              //   child: TextField(
+                              //     decoration: InputDecoration(
+                              //         prefixIcon: Icon(Icons.person),
+                              //         border: OutlineInputBorder(
+                              //           borderRadius:
+                              //               BorderRadius.circular(100.0),
+                              //           borderSide: new BorderSide(
+                              //               color: Colors.teal),
+                              //         ),
+                              //         filled: true,
+                              //         hintStyle:
+                              //             TextStyle(color: Colors.grey[800]),
+                              //         hintText: "Enter Email i'd",
+                              //         fillColor: Colors.white70),
+                              //   ),
+                              // ),
+                              // Container(
+                              //   height: 20,
+                              //   width: double.infinity,
+                              //   // color: Colors.amber,
+                              // ),
+                              // SizedBox(
+                              //   width: deviceSize.width * 0.9,
+                              //   child: TextField(
+                              //     decoration: InputDecoration(
+                              //         prefixIcon: Icon(Icons.lock),
+                              //         border: OutlineInputBorder(
+                              //           borderRadius:
+                              //               BorderRadius.circular(100.0),
+                              //           borderSide:
+                              //               new BorderSide(color: Colors.teal),
+                              //         ),
+                              //         filled: true,
+                              //         hintStyle:
+                              //             TextStyle(color: Colors.grey[800]),
+                              //         hintText: "Enter password",
+                              //         fillColor: Colors.white70),
+                              //   ),
+                              // ),
                               Container(
                                 height: 15,
                                 width: double.infinity,
@@ -281,8 +410,15 @@ class _LoginPageState extends State<Login> {
                               ),
                               GestureDetector(
                                 onTap: () {
-                                  Navigator.of(context)
-                                      .pushNamed(content.routeName);
+                                  // Navigator.pushReplacement<void, void>(
+                                  //   context,
+                                  //   MaterialPageRoute<void>(
+                                  //     builder: (BuildContext context) =>
+                                  //         const content(),
+                                  //   ),
+                                  // );
+                                  SignupFun(emailController.text,
+                                      passwordController.text);
                                 },
                                 child: Container(
                                   width: deviceSize.width * 0.6,
@@ -343,5 +479,21 @@ class _LoginPageState extends State<Login> {
         ),
       ),
     );
+  }
+
+  void SignupFun(String email, String password) async {
+    if (_formKey.currentState!.validate()) {
+      await _auth
+          .signInWithEmailAndPassword(email: email, password: password)
+          .then((uid) => {
+                Fluttertoast.showToast(msg: "Login  sucessfully done"),
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => content()),
+                ),
+              })
+          .catchError((e) {
+        Fluttertoast.showToast(msg: e!.message);
+      });
+    }
   }
 }

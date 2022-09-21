@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:project_1/Login_screen.dart';
 import 'package:project_1/content.dart';
@@ -5,7 +6,11 @@ import 'package:project_1/sign_up.dart';
 import 'intro_page.dart';
 import 'sign_up.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp();
+
   runApp(const MyApp());
 }
 
